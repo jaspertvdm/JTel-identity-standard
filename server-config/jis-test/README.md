@@ -21,6 +21,7 @@ Services (hostpoorten):
 - `POST /nir/confirm` — confirm/rectify. Body: fir_a_id, method, result, continuity_hash_prev.
 - `GET /relation/{fir_a_id}` — laatste hash + eventcount.
 - `GET /health` — status.
+- WebSocket demo: `ws-demo/server.py` (poort 9000, env `WS_PORT`), client in `ws-demo/client.py` (env `WS_URL`, `FIR_A_ID`).
 
 Authenticatie: header `X-JIS-SECRET: <JIS_SHARED_SECRET>` (standaard `changeme` in compose).
 - Optioneel JWT: zet `JWT_SECRET` in docker-compose en stuur `Authorization: Bearer <jwt>` (HS256). Audience/issuer kun je instellen met `JWT_AUDIENCE`/`JWT_ISSUER`.
