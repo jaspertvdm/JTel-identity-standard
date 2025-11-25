@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: jis
+      POSTGRES_PASSWORD: jis
+      POSTGRES_DB: jis
+    ports:
+      - "55432:5432"  # avoid clashing with host Postgres
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "36379:6379"  # avoid clashing with host Redis
+    restart: unless-stopped
+
+  router:
+    build:
+      context: ./router
+    environment:
+      JIS_SHARED_SECRET: denDolder_2024!
+      JIS_PORT: "8081"
+      PGHOST: db
+      PGUSER: jis
+      PGPASSWORD: jis
+      PGDATABASE: jis
+      PGPORT: "5432"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    ports:
+      - "18081:8081"  # avoid clashing with host 8081
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped

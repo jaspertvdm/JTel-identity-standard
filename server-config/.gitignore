@@ -1,0 +1,107 @@
+# Environment variables
+.env
+**/.env
+
+# Sensitive configuration files (specific to services)
+matrix-synapse/homeserver.yaml
+matrix-synapse/synapse-admin-config.json
+ntfy/ntfy-data/etc/server.yml # ntfy's main config, might contain sensitive info
+asterisk/*.conf # Asterisk config files, some might contain credentials
+
+# Data directories
+**/data/
+**/media_store/
+**/ntfy-data/
+**/homeserver.db* # Matrix Synapse database
+
+# Log files
+**/*.log
+**/*.log.*
+
+# Temporary files
+**/*.tmp
+**/*~
+
+# OS generated files
+.DS_Store
+.localized
+Thumbs.db
+
+# Python virtual environments
+**/venv/
+.Python
+env/
+pip-wheel-metadata/
+share/python-wheels/
+*.pyd
+*.pyc
+*.pyo
+__pycache__/
+
+# Go build cache
+.cache/go-build/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.jpi
+*.ser
+.classpath
+.project
+.settings/
+target/
+build/
+
+# Rust
+target/
+
+# C/C++
+*.o
+*.a
+*.so
+*.lo
+*.la
+*.dll
+*.exe
+*.obj
+*.lib
+*.exp
+*.ilk
+*.pdb
+*.idb
+*.res
+*.rc
+*.tlb
+*.tlh
+*.tmp
+*.bak
+*.rej
+*.orig
+*.sbr
+*.bsc
+*.map
+*.dep
+*.d
+*.out
+*.bin
+*.elf
+*.prl
+*.core
+*.stackdump
+
+# Editor/IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
