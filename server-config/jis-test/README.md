@@ -23,8 +23,17 @@ Services (hostpoorten):
 - `GET /health` — status.
 
 Authenticatie: header `X-JIS-SECRET: <JIS_SHARED_SECRET>` (standaard `changeme` in compose).
+- Optioneel JWT: zet `JWT_SECRET` in docker-compose en stuur `Authorization: Bearer <jwt>` (HS256). Audience/issuer kun je instellen met `JWT_AUDIENCE`/`JWT_ISSUER`.
 
 Continuity: elke call retourneert `continuity_hash`; stuur die mee als `continuity_hash_prev` bij de volgende call om ketenconsistentie te bewaken.
+
+Whitelists/rate limiting:
+- Intents/rollen kun je beperken met `ALLOWED_INTENTS` en `ALLOWED_ROLES` (comma separated).
+- Rate limit via Redis: `RATE_LIMIT` req per `RATE_WINDOW` seconden (default 60/60).
+
+TLS/mTLS (optioneel):
+- Zet `TLS_CERT_FILE` en `TLS_KEY_FILE` op pad naar cert/key (mount ze in de container).
+- Client-verificatie: `TLS_CA_FILE` + `TLS_REQUIRE_CLIENT_CERT=true` voor mTLS.
 
 ## Sneltest (curl)
 ```

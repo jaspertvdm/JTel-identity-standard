@@ -23,6 +23,9 @@ services:
       context: ./router
     environment:
       JIS_SHARED_SECRET: denDolder_2024!
+      JWT_SECRET: ""  # optional; when set, Authorization: Bearer <jwt> is required (HS256)
+      JWT_AUDIENCE: ""
+      JWT_ISSUER: ""
       JIS_PORT: "8081"
       PGHOST: db
       PGUSER: jis
@@ -31,6 +34,14 @@ services:
       PGPORT: "5432"
       REDIS_HOST: redis
       REDIS_PORT: "6379"
+      ALLOWED_INTENTS: ""
+      ALLOWED_ROLES: ""
+      RATE_LIMIT: "60"
+      RATE_WINDOW: "60"
+      TLS_CERT_FILE: ""
+      TLS_KEY_FILE: ""
+      TLS_CA_FILE: ""
+      TLS_REQUIRE_CLIENT_CERT: "false"
     ports:
       - "18081:8081"  # avoid clashing with host 8081
     depends_on:
