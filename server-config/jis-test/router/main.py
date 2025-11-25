@@ -11,6 +11,7 @@ import psycopg
 import redis
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from pydantic import BaseModel, Field, field_validator
+from psycopg_pool import ConnectionPool
 
 app = FastAPI(title="JIS Test Router", version="0.3.0")
 
@@ -100,7 +101,7 @@ PG_DATABASE = os.getenv("PGDATABASE", "jis")
 PG_PORT = os.getenv("PGPORT", "5432")
 PG_DSN = f"host={PG_HOST} port={PG_PORT} dbname={PG_DATABASE} user={PG_USER} password={PG_PASSWORD}"
 
-pool = psycopg.ConnectionPool(PG_DSN, min_size=1, max_size=5)
+pool = ConnectionPool(PG_DSN, min_size=1, max_size=5)
 
 
 def init_db() -> None:
@@ -354,15 +355,12 @@ if __name__ == "__main__":
     cafile = os.getenv("TLS_CA_FILE")
     require_client = os.getenv("TLS_REQUIRE_CLIENT_CERT", "false").lower() == "true"
 
-    ssl_context = None
+    ssl_kwargs: Dict[str, Any] = {}
     if certfile and keyfile:
-        ssl_context = ssl.create_default_context(
-            ssl.Purpose.CLIENT_AUTH if require_client else ssl.Purpose.SERVER_AUTH
-        )
-        ssl_context.load_cert_chain(certfile=certfile, keyfile=keyfile)
+        ssl_kwargs["ssl_certfile"] = certfile
+        ssl_kwargs["ssl_keyfile"] = keyfile
         if cafile:
-            ssl_context.load_verify_locations(cafile=cafile)
-        if require_client:
-            ssl_context.verify_mode = ssl.CERT_REQUIRED
+            ssl_kwargs["ssl_ca_certs"] = cafile
+            ssl_kwargs["ssl_cert_reqs"] = ssl.CERT_REQUIRED if require_client else ssl.CERT_OPTIONAL
 
-    uvicorn.run("main:app", host="0.0.0.0", port=port, ssl_context=ssl_context)
+    uvicorn.run("main:app", host="0.0.0.0", port=port, **ssl_kwargs)
