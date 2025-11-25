@@ -21,6 +21,7 @@ exten => _X.,1,NoOp(JIS: call setup)
  same => n,Dial(SIP/${EXTEN})
 ```
 - Productie: gebruik ARI/AGI-script voor betere foutafhandeling; bij 409/401 → flag/NIR.
+- AGI-voorbeeld (std lib): `server-config/integrations/sip-agi/agi_router.py` (zet env JIS_BASE/JIS_SECRET; Dialplan: `AGI(/pad/agi_router.py)`).
 
 ## SMTP (conceptueel)
 - Inkomend/uitgaand e-mail event naar router posten vóór accept/relay:
