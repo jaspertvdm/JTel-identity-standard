@@ -62,3 +62,25 @@ services:
     depends_on:
       - router
     restart: unless-stopped
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    ports:
+      - "31883:1883"  # host port for MQTT
+    restart: unless-stopped
+
+  mqtt-bridge:
+    build:
+      context: ./mqtt-bridge
+    environment:
+      MQTT_HOST: mqtt
+      MQTT_PORT: "1883"
+      MQTT_IN_TOPIC: "jis/in"
+      MQTT_OUT_TOPIC: "jis/out"
+      ROUTER_BASE: "http://router:8081"
+      JIS_SHARED_SECRET: denDolder_2024!
+      JWT_TOKEN: ""
+    depends_on:
+      - router
+      - mqtt
+    restart: unless-stopped
