@@ -8,14 +8,14 @@ services:
       POSTGRES_PASSWORD: jis
       POSTGRES_DB: jis
     ports:
-      - "55432:5432"  # avoid clashing with host Postgres
+      - "55433:5432"  # avoid clashing with host Postgres
     restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     command: ["redis-server", "--save", "", "--appendonly", "no"]
     ports:
-      - "36379:6379"  # avoid clashing with host Redis
+      - "36380:6379"  # avoid clashing with host Redis
     restart: unless-stopped
 
   router:

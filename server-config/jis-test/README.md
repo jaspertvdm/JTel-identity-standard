@@ -9,16 +9,17 @@ cd server-config/jis-test
 docker compose up -d --build
 ```
 
-Services:
-- Router (FastAPI) op poort 8081
-- Postgres op 5432 (nog niet gebruikt, wel gereserveerd)
-- Redis op 6379 (nog niet gebruikt, wel gereserveerd)
+Services (hostpoorten):
+- Router (FastAPI) op 18081 → container 8081
+- Postgres op 55433 → container 5432 (nu gebruikt voor events)
+- Redis op 36380 → container 6379 (gebruikt voor rate limiting)
 
 ## Endpoints (router)
 - `POST /fira/init` — genesis van een relatie. Body: initiator, responder, roles, context, humotica?
 - `POST /ift` — intent + timebox. Body: fir_a_id, intent, context, timebox_seconds, continuity_hash_prev.
 - `POST /nir/notify` — flag/notificatie. Body: fir_a_id, reason, suggested_method?, continuity_hash_prev.
 - `POST /nir/confirm` — confirm/rectify. Body: fir_a_id, method, result, continuity_hash_prev.
+- `GET /relation/{fir_a_id}` — laatste hash + eventcount.
 - `GET /health` — status.
 
 Authenticatie: header `X-JIS-SECRET: <JIS_SHARED_SECRET>` (standaard `changeme` in compose).
@@ -28,7 +29,7 @@ Continuity: elke call retourneert `continuity_hash`; stuur die mee als `continui
 ## Sneltest (curl)
 ```
 SECRET=changeme
-BASE=http://localhost:8081
+BASE=http://localhost:18081
 
 # 1) FIR/A init
 INIT=$(curl -s -X POST "$BASE/fira/init" \
@@ -59,6 +60,5 @@ rm -rf server-config/jis-test  # alleen als je alles wil verwijderen
 ```
 
 ## Wat ontbreekt (bewust)
-- Geen echte opslag van events (in-memory). Postgres/Redis staan klaar om aan te haken.
-- Geen mTLS of rate limiting; enkel shared secret header.
+- Geen mTLS/TLS, enkel shared secret header (voor productie: mTLS of gesigneerde tokens toevoegen).
 - Geen app-agent code; app kan direct POST’en met het shared secret.
