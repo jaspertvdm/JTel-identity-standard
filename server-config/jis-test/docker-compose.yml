@@ -2,11 +2,18 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: jis
-      POSTGRES_PASSWORD: jis
-      POSTGRES_DB: jis
+      POSTGRES_USER: ${POSTGRES_USER:-jis}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-jis}
+      POSTGRES_DB: ${POSTGRES_DB:-jis}
     ports:
       - "55433:5432"  # avoid clashing with host Postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jis"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
   redis:
@@ -14,28 +21,33 @@ services:
     command: ["redis-server", "--save", "", "--appendonly", "no"]
     ports:
       - "36381:6379"  # avoid clashing with host Redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
     restart: unless-stopped
 
   router:
     build:
       context: ./router
     environment:
-      JIS_SHARED_SECRET: denDolder_2024!
-      JWT_SECRET: ""  # optional; when set, Authorization: Bearer <jwt> is required (HS256)
-      JWT_AUDIENCE: ""
-      JWT_ISSUER: ""
+      JIS_SHARED_SECRET: ${JIS_SHARED_SECRET:-denDolder_2024!}
+      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-}
+      JWT_ISSUER: ${JWT_ISSUER:-}
       JIS_PORT: "8081"
       PGHOST: db
-      PGUSER: jis
-      PGPASSWORD: jis
-      PGDATABASE: jis
+      PGUSER: ${POSTGRES_USER:-jis}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-jis}
+      PGDATABASE: ${POSTGRES_DB:-jis}
       PGPORT: "5432"
       REDIS_HOST: redis
       REDIS_PORT: "6379"
-      ALLOWED_INTENTS: ""
-      ALLOWED_ROLES: ""
-      RATE_LIMIT: "60"
-      RATE_WINDOW: "60"
+      ALLOWED_INTENTS: ${ALLOWED_INTENTS:-}
+      ALLOWED_ROLES: ${ALLOWED_ROLES:-}
+      RATE_LIMIT: ${RATE_LIMIT:-60}
+      RATE_WINDOW: ${RATE_WINDOW:-60}
       TLS_CERT_FILE: ""
       TLS_KEY_FILE: ""
       TLS_CA_FILE: ""
@@ -43,8 +55,16 @@ services:
     ports:
       - "18081:8081"  # avoid clashing with host 8081
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8081/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 
   ws-bridge:
@@ -53,18 +73,24 @@ services:
     environment:
       WS_PORT: "9000"
       ROUTER_BASE: "http://router:8081"
-      JIS_SHARED_SECRET: denDolder_2024!
-      JWT_TOKEN: ""
+      JIS_SHARED_SECRET: ${JIS_SHARED_SECRET:-denDolder_2024!}
+      JWT_TOKEN: ${JWT_TOKEN:-}
     ports:
       - "9000:9000"
     depends_on:
-      - router
+      router:
+        condition: service_healthy
     restart: unless-stopped
 
   mqtt:
     image: eclipse-mosquitto:2
     ports:
       - "31883:1883"  # host port for MQTT
+    healthcheck:
+      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     restart: unless-stopped
 
   mqtt-bridge:
@@ -76,9 +102,15 @@ services:
       MQTT_IN_TOPIC: "jis/in"
       MQTT_OUT_TOPIC: "jis/out"
       ROUTER_BASE: "http://router:8081"
-      JIS_SHARED_SECRET: denDolder_2024!
-      JWT_TOKEN: ""
+      JIS_SHARED_SECRET: ${JIS_SHARED_SECRET:-denDolder_2024!}
+      JWT_TOKEN: ${JWT_TOKEN:-}
     depends_on:
-      - router
-      - mqtt
+      router:
+        condition: service_healthy
+      mqtt:
+        condition: service_healthy
     restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
