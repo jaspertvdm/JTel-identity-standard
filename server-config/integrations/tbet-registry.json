@@ -1,0 +1,251 @@
+{
+  "$schema": "https://jtel-identity-standard.org/schemas/tbet-v1.json",
+  "version": "1.0.0",
+  "description": "TBET (Targeting of Telephony Behavior with Extended Trusted Intent) Registry",
+  "updated": "2025-11-26",
+
+  "intents": {
+    "verified_call_setup": {
+      "category": "telephony",
+      "description": "Call from verified caller (has DID + HID binding)",
+      "requires": {
+        "did_key": true,
+        "hid_binding": true,
+        "roles": ["caller"],
+        "context_fields": ["caller_number", "callee_number"]
+      },
+      "actions": {
+        "display": {
+          "prefix": "✓ VERIFIED",
+          "color": "green",
+          "priority": "high"
+        },
+        "routing": {
+          "allow_direct": true,
+          "skip_screening": false,
+          "log_level": "info"
+        },
+        "security": {
+          "record_chain": true,
+          "require_continuity": true,
+          "flag_on_mismatch": true
+        }
+      },
+      "sla": {
+        "max_setup_time_ms": 500,
+        "max_routing_delay_ms": 100
+      }
+    },
+
+    "unverified_call_setup": {
+      "category": "telephony",
+      "description": "Call from unverified caller (no DID/HID)",
+      "requires": {
+        "did_key": false,
+        "hid_binding": false,
+        "context_fields": ["caller_number", "callee_number"]
+      },
+      "actions": {
+        "display": {
+          "prefix": "⚠ UNVERIFIED",
+          "color": "orange",
+          "priority": "low"
+        },
+        "routing": {
+          "allow_direct": false,
+          "require_screening": true,
+          "challenge_response": true,
+          "log_level": "warning"
+        },
+        "security": {
+          "record_chain": true,
+          "require_continuity": false,
+          "flag_suspicious": true,
+          "rate_limit": {
+            "calls_per_hour": 5,
+            "block_on_exceed": true
+          }
+        }
+      },
+      "sla": {
+        "max_setup_time_ms": 2000,
+        "max_routing_delay_ms": 500
+      }
+    },
+
+    "register_verified_caller": {
+      "category": "identity",
+      "description": "Register phone number with DID/HID for verified calling",
+      "requires": {
+        "did_key": true,
+        "hid_binding": true,
+        "roles": ["caller", "phone_owner"],
+        "context_fields": ["phone_number", "display_name"]
+      },
+      "actions": {
+        "storage": {
+          "persist_did": true,
+          "persist_hid_binding": true,
+          "create_identity_record": true
+        },
+        "validation": {
+          "verify_phone_ownership": true,
+          "require_sms_confirmation": false,
+          "biometric_attestation": "recommended"
+        }
+      }
+    },
+
+    "emergency_call": {
+      "category": "telephony",
+      "description": "Emergency call (112, 911, etc.)",
+      "requires": {
+        "context_fields": ["caller_number", "callee_number", "location"]
+      },
+      "actions": {
+        "display": {
+          "prefix": "🚨 EMERGENCY",
+          "color": "red",
+          "priority": "urgent"
+        },
+        "routing": {
+          "priority_routing": true,
+          "skip_all_checks": true,
+          "direct_connect": true,
+          "record_mandatory": true
+        },
+        "location": {
+          "send_gps": true,
+          "send_cell_tower": true,
+          "update_realtime": true
+        }
+      },
+      "sla": {
+        "max_setup_time_ms": 100,
+        "guaranteed_connect": true
+      }
+    },
+
+    "business_call": {
+      "category": "telephony",
+      "description": "Business/commercial call (requires business verification)",
+      "requires": {
+        "did_key": true,
+        "roles": ["business", "caller"],
+        "context_fields": ["business_name", "business_registration", "caller_number"]
+      },
+      "actions": {
+        "display": {
+          "prefix": "🏢 BUSINESS",
+          "show_business_name": true,
+          "show_registration": true,
+          "color": "blue"
+        },
+        "compliance": {
+          "check_do_not_call": true,
+          "require_consent": true,
+          "record_for_audit": true
+        }
+      }
+    },
+
+    "spam_detected": {
+      "category": "security",
+      "description": "Suspected spam call (triggered by heuristics)",
+      "requires": {
+        "context_fields": ["caller_number", "spam_score"]
+      },
+      "actions": {
+        "display": {
+          "prefix": "🚫 LIKELY SPAM",
+          "color": "red",
+          "show_warning": true
+        },
+        "routing": {
+          "block_direct": true,
+          "send_to_voicemail": true,
+          "silent_reject": true
+        },
+        "security": {
+          "flag_number": true,
+          "report_to_registry": true,
+          "log_level": "warning"
+        }
+      }
+    },
+
+    "callback_request": {
+      "category": "telephony",
+      "description": "Request callback from verified caller",
+      "requires": {
+        "did_key": true,
+        "hid_binding": true,
+        "context_fields": ["caller_number", "callback_time"]
+      },
+      "actions": {
+        "scheduling": {
+          "create_callback_task": true,
+          "notify_callee": true,
+          "require_confirmation": true
+        }
+      }
+    },
+
+    "video_call_setup": {
+      "category": "webrtc",
+      "description": "Verified video call (WebRTC)",
+      "requires": {
+        "did_key": true,
+        "hid_binding": true,
+        "roles": ["caller"],
+        "context_fields": ["caller_id", "callee_id", "media_type"]
+      },
+      "actions": {
+        "display": {
+          "prefix": "📹 VERIFIED VIDEO",
+          "show_preview": true,
+          "color": "green"
+        },
+        "media": {
+          "require_encryption": true,
+          "dtls_srtp_mandatory": true,
+          "record_optional": true
+        }
+      }
+    }
+  },
+
+  "policies": {
+    "default_unverified_behavior": {
+      "description": "How to handle calls without verification",
+      "action": "challenge",
+      "options": ["block", "challenge", "allow_with_warning", "voicemail"]
+    },
+
+    "anti_spoofing": {
+      "description": "Anti caller-ID spoofing policy",
+      "enabled": true,
+      "require_hid_for_display_name": true,
+      "block_international_spoofing": true
+    },
+
+    "rate_limiting": {
+      "verified_callers": {
+        "calls_per_hour": 100,
+        "burst": 10
+      },
+      "unverified_callers": {
+        "calls_per_hour": 5,
+        "burst": 2
+      }
+    }
+  },
+
+  "display_templates": {
+    "verified_incoming": "✓ {display_name} ({phone_number})",
+    "unverified_incoming": "⚠ {phone_number} (Unverified)",
+    "business_incoming": "🏢 {business_name}\n{phone_number}",
+    "spam_incoming": "🚫 LIKELY SPAM\n{phone_number}",
+    "emergency_incoming": "🚨 EMERGENCY CALL\n{location}"
+  }
+}
