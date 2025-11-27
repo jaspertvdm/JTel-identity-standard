@@ -1,3 +1,181 @@
+
+📄 JIS Betti–Topology Specification v1.0
+
+(Draft for JTel Identity Standard)
+
+1. Doel
+
+Deze specificatie definieert de dimensionale veiligheidslaag binnen JTel Identity Standard (JIS).
+Het koppelt linguïstische intentie (Humotica), context awareness, en cryptografische continuïteit aan topologische invarianten.
+
+Kort:
+JIS gebruikt Betti-structuren om menselijk gedrag + device gedrag te modelleren als vormen.
+Security = mismatch in vorm.
+
+2. Dimensies
+0D — Identity Nodes (HID, DID, OID)
+
+HID: human identity
+
+DID: device identity
+
+OID: object/document identity
+Topologische equivalentie: punt.
+
+1D — Continuity Lines (FIR/A + IFT + NIR)
+
+FIR/A: genesis link
+
+IFT: intent-step transitions
+
+Continuity hash chain
+Topologisch: pad / curve.
+
+2D — Context Fields (Role ↔ Intent ↔ Capability)
+
+context overlays
+
+dynamic role surfaces
+
+semantic permission grids
+Topologisch: vlak / oppervlak.
+
+3D — Multi-Agent Volumes (actor ensembles)
+
+actor/device clusters
+
+autonomous mapping
+
+TBET orchestration
+Topologisch: volume.
+
+3. Betti-Invariants in JIS
+
+Voor elke interactie:
+
+B₀: aantal entiteiten in sessie
+
+B₁: aantal bestendige continuïteitspaden
+
+B₂: aantal permissievelden
+
+B₃: aantal autonome multi-agent structuren
+
+Mismatch → flag.
+
+Mismatch + suspicion → NIR.
+Mismatch + violation → lock.
+
+4. TBET / BETTI
+
+TBET: micro-temporal intent token (grain)
+
+BETTI: macro “intention topology” (mass)
+
+In combinatie vormen ze:
+
+Temporal Semantic Topology (TST)
+
+5. Security Guarantees
+
+Deze laag biedt:
+
+tamper-resistant semantic continuity
+
+contextual mismatch detection
+
+actor-space anomaly detection
+
+multi-agent integrity
+
+linguistic + behavioural fingerprinting
+
+cryptographically anchored topology
+
+6. Use Cases
+SIP / Calling
+
+Verified caller handshake
+
+Time-boxed TBET
+
+HID challenge
+
+Semantic continuity from signaling → human
+
+IoT
+
+device roles
+
+context surfaces
+
+TBET-limited operations
+
+autonomy bounding
+
+Robotica
+
+DO/OD identity
+
+action volume validation
+
+misbehaviour topological gaps (detectable)
+
+Messaging
+
+OFC/INFC mapping
+
+human-verified payload
+
+“registered intent” before sending
+
+7. Export Formats
+HTTP
+
+Headers:
+
+JIS-FIRA
+JIS-TBET
+JIS-BETTI
+JIS-ROLE
+JIS-CONTEXT
+
+WS
+
+Binary or JSON frames.
+
+SIP
+
+Custom extension header:
+
+X-JIS-TBET:
+X-JIS-HID:
+X-JIS-BETTI:
+
+8. Conclusion
+
+JIS Betti Topology vormt de eerste dimensionale semantische veiligheidslaag die:
+
+mens
+
+device
+
+intent
+
+tijd
+
+context
+
+cryptografie
+
+routing
+
+autonomie
+
+in één coherent model combineert.
+
+
+
 # JTel Kit - Raspberry Pi Demo
 
 **Powered by context, driven by intent**
