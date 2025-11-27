@@ -10,7 +10,27 @@ Complete Python client for TIBET intent declaration and BETTI coordination.
 
 ```bash
 cd client-sdk/python/tibet_betti_client
+
+# Option 1: Install dependencies only
+pip install -r requirements.txt
+
+# Option 2: Install as package (development mode)
 pip install -e .
+
+# Verify installation
+python test_installation.py
+```
+
+**Requirements:**
+- Python 3.8+
+- `requests` >= 2.28.0
+- `websocket-client` >= 1.6.0
+
+### Quick Test
+
+```bash
+# Run hello world example (requires BETTI router running)
+python examples/hello_world.py
 ```
 
 ### Basic Usage

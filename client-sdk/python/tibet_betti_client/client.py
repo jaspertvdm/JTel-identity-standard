@@ -17,13 +17,27 @@ from .context import Context, SenseRule
 from .trust_token import TrustToken, FIRARelationship
 from .websocket import TibetWebSocket
 
-# Import from existing JIS client
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'jis_client'))
-from crypto import DIDKey, HIDKey
-
 logger = logging.getLogger(__name__)
+
+# Optional crypto imports - only needed if generating keys
+DIDKey = None
+HIDKey = None
+
+def _import_crypto():
+    """Lazy import crypto modules"""
+    global DIDKey, HIDKey
+    if DIDKey is None:
+        try:
+            import sys
+            import os
+            sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'jis_client'))
+            from crypto import DIDKey as _DIDKey, HIDKey as _HIDKey
+            DIDKey = _DIDKey
+            HIDKey = _HIDKey
+        except ImportError as e:
+            logger.warning(f"Crypto modules not available: {e}")
+            logger.warning("Key generation will be disabled. Install cryptography package if needed.")
+    return DIDKey, HIDKey
 
 
 class TibetBettiClient:
@@ -137,7 +151,7 @@ class TibetBettiClient:
         roles: Optional[List[str]] = None,
         context: Optional[Dict[str, Any]] = None,
         trust_level: int = 1,
-        generate_keys: bool = True
+        generate_keys: bool = False
     ) -> FIRARelationship:
         """
         Establish trust relationship (FIR/A)
@@ -150,7 +164,7 @@ class TibetBettiClient:
             roles: Optional roles list
             context: Optional context info
             trust_level: Trust level (0-5)
-            generate_keys: Auto-generate DID/HID keys
+            generate_keys: Auto-generate DID/HID keys (requires cryptography package)
 
         Returns:
             FIRARelationship with token
@@ -160,8 +174,16 @@ class TibetBettiClient:
             >>> print(rel.token)  # Trust token ID
         """
         # Generate keys if requested
-        did = DIDKey.generate() if generate_keys else None
-        hid = HIDKey.generate() if generate_keys else None
+        did = None
+        hid = None
+
+        if generate_keys:
+            DIDKey_cls, HIDKey_cls = _import_crypto()
+            if DIDKey_cls and HIDKey_cls:
+                did = DIDKey_cls.generate()
+                hid = HIDKey_cls.generate()
+            else:
+                logger.warning("Cannot generate keys - crypto modules not available")
 
         # Build payload
         payload = {
