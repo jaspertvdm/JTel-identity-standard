@@ -198,6 +198,121 @@ Automatic anomaly detection and intent flagging system.
 
 ---
 
+## Continuous Verification (IO/DO/OD)
+
+### IO
+**Identity OK**
+
+Continuous human identity verification - "Is the human still who they claim to be?"
+
+- Not just login verification - continuous checking
+- Behavioral analysis and pattern matching
+- Biometric spot-checks when needed
+- Flags suspicious deviations
+- Human continuity state
+
+**Implementation:** `io_do_od.py`
+
+**Usage:** "IO check", "IO=OK", "IO flagged", "human continuity"
+
+---
+
+### DO
+**Device OK / Device Opt**
+
+Continuous device trustworthiness verification - "Is the device still trustworthy?"
+
+- Device continuity state monitoring
+- Internal consistency checks
+- Hardware/software integrity validation
+- Detects device compromises
+- Apparatus continuity state
+
+**Implementation:** `io_do_od.py`
+
+**Usage:** "DO check", "DO=OK", "device continuity", "apparatus state"
+
+---
+
+### OD
+**Operation Device / Operation Determination**
+
+Operation validation - "Is this operation allowed on this device?"
+
+- Validates operation against device role
+- Checks operation-device compatibility
+- Context-aware operation approval
+- External consistency between devices
+- Operational logic validation
+
+**Implementation:** `io_do_od.py`
+
+**Usage:** "OD check", "OD validation", "operation allowed", "OD rejection"
+
+---
+
+## Content Security (INFC/OFC/SCS)
+
+### INFC
+**Initially Not Flaggable Content**
+
+Content without semantic meaning - raw digital objects before intent declaration.
+
+- Photos, documents, media files without context
+- Meaningless until paired with intent (IFT)
+- Cannot be validated without semantic framework
+- Always assessed via DO → OD → IO after mapping
+
+**Flow:** INFC → IFT → OFC
+
+**Usage:** "INFC object", "raw content", "semantically undefined"
+
+---
+
+### OFC
+**Operation Flaggable Content**
+
+Content with semantic meaning after intent declaration.
+
+- INFC becomes OFC after receiving IFT + SCS
+- Carries semantic provenance (not just crypto)
+- Can be validated against intent
+- Includes context, origin, and continuity signature
+- Flaggable if mismatched with declared intent
+
+**Flow:** INFC + IFT + SCS → OFC
+
+**Components:**
+- Original INFC object
+- IFT (Intent-First Transmission)
+- SCS (Semantic Continuity Signature)
+- Context and origin metadata
+
+**Usage:** "OFC validation", "semantic content", "flaggable object"
+
+---
+
+### SCS
+**Semantic Continuity Signature**
+
+External, non-forgeable semantic signature for content provenance.
+
+- NOT embedded in the object itself
+- Links to continuity chain
+- Proves human/device origin without exposing biometrics
+- Uses DID derivatives (not HID directly)
+- Enables tamper detection through semantic verification
+
+**Key Properties:**
+- External to content
+- Tied to continuity chain
+- Human-origin proof without biometric leakage
+- Deepfake/AI-imitation resistant
+
+**Usage:** "SCS verification", "semantic signature", "continuity proof"
+
+---
+
 ## System Architecture
 
 ### Context/Sense/Intent Layers
@@ -216,12 +331,30 @@ Three-layer BETTI decision architecture:
 
 Immutable audit trail using SHA-256 linked hashing.
 
-- Every interaction creates hash
-- Each hash links to previous (blockchain-like)
-- Tamper-evident history
-- Complete traceability
+- Every interaction creates hash (incremental continuity_hash)
+- Each hash links to previous: `prev_hash + event → new_hash`
+- Blockchain-like tamper-evident history
+- Complete traceability of all interactions
+- Stores IO/DO/OD status, IFT, and OFC/INFC metadata
+- HID stays private, only DID/OFC info in chain
 
-**Usage:** "Continuity chain", "continuity hash", "chain validation"
+**Database:** `continuity_event` table with `continuity_hash_prev` linking
+
+**Usage:** "Continuity chain", "continuity hash", "chain validation", "prev_hash"
+
+---
+
+### Trust Token
+
+Trust relationship token established through FIR/A.
+
+- Begins with FIR/A genesis moment
+- Tracked through continuity chain
+- Can be built regardless of initial accept/revoke
+- Enables relationship history and reputation
+- Cryptographically verifiable
+
+**Usage:** "Trust token", "relationship token", "FIR/A token"
 
 ---
 
@@ -296,6 +429,12 @@ Identity and relationship router (Docker).
 | HID | Human Identity | Crypto | Human-device binding |
 | IFT | Intent-First Transmission | Protocol | Semantic-first communication |
 | NIR | Notify/Identify/Rectify | Protocol | Error recovery |
+| IO | Identity OK | Verification | Human continuity |
+| DO | Device OK/Opt | Verification | Device continuity |
+| OD | Operation Device/Determination | Verification | Operation validation |
+| INFC | Initially Not Flaggable Content | Content | Semantically undefined object |
+| OFC | Operation Flaggable Content | Content | Semantic content with intent |
+| SCS | Semantic Continuity Signature | Content | External semantic signature |
 | SNAFT | System Not Authorized For That | Security | Factory firewall |
 | BALANS | BETTI Autonomous Layer Analysis | Security | Pre-execution validation |
 | HICSS | Halt Intent Change Switch Stop | Security | Emergency override |
