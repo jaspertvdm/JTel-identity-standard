@@ -1,7 +1,9 @@
 import hashlib
 import json
+import logging
 import os
 import ssl
+import sys
 import time
 import uuid
 from typing import Any, Dict, List, Optional, Tuple
@@ -10,10 +12,31 @@ import jwt
 import psycopg
 import redis
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field, field_validator
 from psycopg_pool import ConnectionPool
 
-app = FastAPI(title="JIS Test Router", version="0.3.0")
+# Structured logging setup
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+logger = logging.getLogger("jis.router")
+
+app = FastAPI(title="JIS Production Router", version="0.4.0")
+
+# Mount static files for admin UI
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+class DIDKeyExchange(BaseModel):
+    """DID key exchange payload"""
+    did_public: str = Field(..., description="DID public key in PEM format")
+    exchange_public: Optional[str] = Field(None, description="Key exchange public key (hex)")
+    hid_did_binding: Optional[str] = Field(None, description="HID-DID binding hash (local verification only)")
+    signature: Optional[str] = Field(None, description="Signature proving DID ownership")
 
 
 class FIRInit(BaseModel):
@@ -24,6 +47,8 @@ class FIRInit(BaseModel):
     humotica: Optional[str] = Field(
         None, description="Optional human/intent trace for the FIR/A genesis"
     )
+    initiator_did: Optional[DIDKeyExchange] = Field(None, description="Initiator's DID key")
+    responder_did: Optional[DIDKeyExchange] = Field(None, description="Responder's DID key")
 
     @field_validator("roles")
     @classmethod
@@ -105,22 +130,20 @@ pool = ConnectionPool(PG_DSN, min_size=1, max_size=5)
 
 
 def init_db() -> None:
-    with pool.connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                CREATE TABLE IF NOT EXISTS events (
-                    id BIGSERIAL PRIMARY KEY,
-                    fir_a_id UUID NOT NULL,
-                    seq INTEGER NOT NULL,
-                    continuity_hash TEXT NOT NULL,
-                    payload JSONB NOT NULL,
-                    ts TIMESTAMPTZ DEFAULT NOW()
-                );
-                CREATE INDEX IF NOT EXISTS idx_events_fir ON events(fir_a_id, seq DESC);
-                """
-            )
-        conn.commit()
+    """Initialize database using migration system"""
+    import subprocess
+    logger.info("Running database migrations...")
+    try:
+        result = subprocess.run(
+            ["python", "migrate.py"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        logger.info(f"Migrations completed: {result.stdout}")
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Migration failed: {e.stderr}")
+        raise
 
 
 def fetch_last(fir_a_id: str) -> Optional[Tuple[int, str]]:
@@ -163,9 +186,79 @@ def append_event_db(fir_a_id: str, event: Dict[str, Any], continuity_hash_prev: 
     return new_hash, new_seq
 
 
+@app.get("/")
+def root() -> RedirectResponse:
+    """Redirect to admin UI"""
+    return RedirectResponse(url="/static/index.html")
+
+
 @app.get("/health")
-def health() -> Dict[str, str]:
-    return {"status": "ok"}
+def health() -> Dict[str, Any]:
+    """Basic health check endpoint"""
+    return {"status": "ok", "version": "0.4.0"}
+
+
+@app.get("/health/live")
+def liveness() -> Dict[str, str]:
+    """Kubernetes liveness probe - is the app running?"""
+    return {"status": "alive"}
+
+
+@app.get("/health/ready")
+def readiness() -> Dict[str, Any]:
+    """Kubernetes readiness probe - can the app serve traffic?"""
+    checks = {}
+    overall_status = "ready"
+
+    # Check Postgres
+    try:
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1")
+        checks["postgres"] = "ok"
+    except Exception as e:
+        logger.error(f"Postgres health check failed: {e}")
+        checks["postgres"] = f"error: {str(e)}"
+        overall_status = "not_ready"
+
+    # Check Redis
+    try:
+        redis_client.ping()
+        checks["redis"] = "ok"
+    except Exception as e:
+        logger.error(f"Redis health check failed: {e}")
+        checks["redis"] = f"error: {str(e)}"
+        overall_status = "not_ready"
+
+    return {"status": overall_status, "checks": checks}
+
+
+@app.get("/metrics")
+def metrics() -> Dict[str, Any]:
+    """Basic metrics endpoint (Prometheus-compatible JSON)"""
+    stats = {}
+
+    # Database stats
+    try:
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(DISTINCT fir_a_id) FROM events")
+                stats["total_relationships"] = cur.fetchone()[0]
+                cur.execute("SELECT COUNT(*) FROM events")
+                stats["total_events"] = cur.fetchone()[0]
+    except Exception as e:
+        logger.error(f"Failed to fetch DB metrics: {e}")
+        stats["db_error"] = str(e)
+
+    # Redis stats
+    try:
+        info = redis_client.info("stats")
+        stats["redis_total_commands"] = info.get("total_commands_processed", 0)
+    except Exception as e:
+        logger.error(f"Failed to fetch Redis metrics: {e}")
+        stats["redis_error"] = str(e)
+
+    return stats
 
 
 # --- Basic rate limiting via Redis (per IP per window) ---------------------
@@ -248,10 +341,13 @@ def rate_limit(request: Request) -> None:
 )
 def fira_init(body: FIRInit) -> EventResponse:
     fir_a_id = str(uuid.uuid4())
+    logger.info(f"Initializing new FIR/A relationship: {fir_a_id} ({body.initiator} <-> {body.responder})")
+
     # Optional role whitelist
     if ALLOWED_ROLES:
         disallowed = [r for r in body.roles if r not in ALLOWED_ROLES]
         if disallowed:
+            logger.warning(f"FIR/A init rejected - disallowed roles: {disallowed}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"roles not allowed: {disallowed}",
@@ -263,18 +359,55 @@ def fira_init(body: FIRInit) -> EventResponse:
         "roles": body.roles,
         "context": body.context,
         "humotica": body.humotica,
+        "has_did_keys": bool(body.initiator_did or body.responder_did),
     }
     event_with_meta = with_timestamp(genesis_event)
     continuity_hash = incremental_hash("", event_with_meta)
 
     with pool.connection() as conn:
         with conn.cursor() as cur:
+            # Insert genesis event
             cur.execute(
                 "INSERT INTO events (fir_a_id, seq, continuity_hash, payload) VALUES (%s, %s, %s, %s)",
                 (fir_a_id, 1, continuity_hash, json.dumps(event_with_meta)),
             )
+
+            # Store DID keys if provided
+            if body.initiator_did:
+                logger.info(f"Storing initiator DID key for {fir_a_id}")
+                cur.execute(
+                    """
+                    INSERT INTO did_keys (fir_a_id, entity_name, did_public_key, exchange_public_key, hid_did_binding)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """,
+                    (
+                        fir_a_id,
+                        "initiator",
+                        body.initiator_did.did_public,
+                        body.initiator_did.exchange_public,
+                        body.initiator_did.hid_did_binding,
+                    ),
+                )
+
+            if body.responder_did:
+                logger.info(f"Storing responder DID key for {fir_a_id}")
+                cur.execute(
+                    """
+                    INSERT INTO did_keys (fir_a_id, entity_name, did_public_key, exchange_public_key, hid_did_binding)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """,
+                    (
+                        fir_a_id,
+                        "responder",
+                        body.responder_did.did_public,
+                        body.responder_did.exchange_public,
+                        body.responder_did.hid_did_binding,
+                    ),
+                )
+
         conn.commit()
 
+    logger.info(f"FIR/A {fir_a_id} created successfully with hash {continuity_hash[:8]}...")
     return EventResponse(fir_a_id=fir_a_id, continuity_hash=continuity_hash, events=1)
 
 
@@ -334,11 +467,127 @@ def nir_confirm(body: NIRConfirm) -> EventResponse:
     dependencies=[Depends(require_auth), Depends(rate_limit)],
 )
 def relation_info(fir_a_id: str) -> Dict[str, Any]:
+    """Get current state of a FIR/A relationship"""
     last = fetch_last(fir_a_id)
     if not last:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown FIR/A")
     seq, hsh = last
     return {"fir_a_id": fir_a_id, "events": seq, "continuity_hash": hsh}
+
+
+@app.get(
+    "/relation/{fir_a_id}/events",
+    dependencies=[Depends(require_auth), Depends(rate_limit)],
+)
+def relation_events(fir_a_id: str, limit: int = 50, offset: int = 0) -> Dict[str, Any]:
+    """Get event history for a FIR/A relationship"""
+    with pool.connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT seq, continuity_hash, payload, ts
+                FROM events
+                WHERE fir_a_id = %s
+                ORDER BY seq DESC
+                LIMIT %s OFFSET %s
+                """,
+                (fir_a_id, limit, offset),
+            )
+            rows = cur.fetchall()
+
+    if not rows:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown FIR/A")
+
+    events = []
+    for row in rows:
+        events.append({
+            "seq": row[0],
+            "continuity_hash": row[1],
+            "payload": row[2],
+            "timestamp": row[3].isoformat() if row[3] else None,
+        })
+
+    return {
+        "fir_a_id": fir_a_id,
+        "events": events,
+        "limit": limit,
+        "offset": offset,
+    }
+
+
+@app.get(
+    "/admin/relationships",
+    dependencies=[Depends(require_auth)],
+)
+def list_relationships(limit: int = 100, offset: int = 0) -> Dict[str, Any]:
+    """List all FIR/A relationships (admin endpoint)"""
+    with pool.connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT DISTINCT ON (fir_a_id) fir_a_id, seq, continuity_hash, ts
+                FROM events
+                ORDER BY fir_a_id, seq DESC
+                LIMIT %s OFFSET %s
+                """,
+                (limit, offset),
+            )
+            rows = cur.fetchall()
+
+    relationships = []
+    for row in rows:
+        relationships.append({
+            "fir_a_id": str(row[0]),
+            "last_event_seq": row[1],
+            "continuity_hash": row[2],
+            "last_update": row[3].isoformat() if row[3] else None,
+        })
+
+    return {
+        "relationships": relationships,
+        "count": len(relationships),
+        "limit": limit,
+        "offset": offset,
+    }
+
+
+@app.get(
+    "/relation/{fir_a_id}/keys",
+    dependencies=[Depends(require_auth)],
+)
+def get_did_keys(fir_a_id: str) -> Dict[str, Any]:
+    """Get DID keys for a FIR/A relationship"""
+    with pool.connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT entity_name, did_public_key, exchange_public_key, hid_did_binding, created_at
+                FROM did_keys
+                WHERE fir_a_id = %s
+                """,
+                (fir_a_id,),
+            )
+            rows = cur.fetchall()
+
+    if not rows:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No DID keys found for this FIR/A (or relationship doesn't exist)"
+        )
+
+    keys = {}
+    for row in rows:
+        keys[row[0]] = {
+            "did_public_key": row[1],
+            "exchange_public_key": row[2],
+            "hid_did_binding": row[3],
+            "created_at": row[4].isoformat() if row[4] else None,
+        }
+
+    return {
+        "fir_a_id": fir_a_id,
+        "keys": keys,
+    }
 
 
 @app.on_event("startup")

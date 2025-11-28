@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JIS Router - Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 JIS Router Admin</h1>
+            <p class="subtitle">JTel Identity Standard - Production Dashboard</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="overview">Overview</button>
+            <button class="tab-btn" data-tab="relationships">Relationships</button>
+            <button class="tab-btn" data-tab="health">Health</button>
+        </nav>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <h3>Total Relationships</h3>
+                    <div class="metric-value" id="total-relationships">—</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Total Events</h3>
+                    <div class="metric-value" id="total-events">—</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Redis Commands</h3>
+                    <div class="metric-value" id="redis-commands">—</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Router Status</h3>
+                    <div class="metric-value status" id="router-status">—</div>
+                </div>
+            </section>
+
+            <section class="chart-section">
+                <h2>Recent Activity</h2>
+                <div class="activity-list" id="recent-activity">
+                    <p class="loading">Loading recent relationships...</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Relationships Tab -->
+        <div id="relationships" class="tab-content">
+            <section>
+                <div class="section-header">
+                    <h2>FIR/A Relationships</h2>
+                    <button class="btn-refresh" onclick="loadRelationships()">↻ Refresh</button>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="search-fira" placeholder="Search by FIR/A ID..." />
+                </div>
+                <div class="table-container">
+                    <table id="relationships-table">
+                        <thead>
+                            <tr>
+                                <th>FIR/A ID</th>
+                                <th>Last Event</th>
+                                <th>Continuity Hash</th>
+                                <th>Last Update</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="relationships-tbody">
+                            <tr><td colspan="5" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Health Tab -->
+        <div id="health" class="tab-content">
+            <section>
+                <h2>System Health</h2>
+                <div class="health-grid">
+                    <div class="health-card" id="postgres-health">
+                        <h3>PostgreSQL</h3>
+                        <div class="health-status">—</div>
+                    </div>
+                    <div class="health-card" id="redis-health">
+                        <h3>Redis</h3>
+                        <div class="health-status">—</div>
+                    </div>
+                </div>
+                <div class="health-details">
+                    <h3>Readiness Check</h3>
+                    <pre id="readiness-json">{}</pre>
+                </div>
+            </section>
+        </div>
+
+        <!-- Event Detail Modal -->
+        <div id="event-modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Event History</h2>
+                <div id="event-detail">
+                    <p class="loading">Loading events...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>JTel Identity Standard v0.4.0 | Powered by Semantic Safety</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
