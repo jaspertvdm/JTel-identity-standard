@@ -91,7 +91,7 @@ curl http://localhost:18081/metrics
 
 # Admin UI
 # Browser: http://localhost:18081/
-# Login: JIS_SHARED_SECRET (default: denDolder_2024!)
+# Login: JIS_SHARED_SECRET (default: example_secret_123)
 ```
 
 ---
@@ -125,7 +125,7 @@ python examples/live_demo.py
 ```python
 from jis_client import JISClient, DIDKey, HIDKey
 
-client = JISClient("http://localhost:18081", secret="denDolder_2024!")
+client = JISClient("http://localhost:18081", secret="example_secret_123")
 did, hid = DIDKey.generate(), HIDKey.generate()
 
 fir_a = client.init_relationship(
@@ -242,7 +242,7 @@ SELECT * FROM schema_migrations;
 
 ### Curl Tests
 ```bash
-SECRET="denDolder_2024!"
+SECRET="example_secret_123"
 BASE="http://localhost:18081"
 
 # Health
@@ -271,7 +271,7 @@ curl -X POST "$BASE/ift" \
 ### Python Quick Test
 ```python
 from jis_client import JISClient
-client = JISClient("http://localhost:18081", secret="denDolder_2024!")
+client = JISClient("http://localhost:18081", secret="example_secret_123")
 print(client.health_check())
 ```
 

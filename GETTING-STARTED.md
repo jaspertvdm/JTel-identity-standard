@@ -156,7 +156,7 @@ http://YOUR_PI_IP:18081/
 ### Login
 
 Je wordt gevraagd om de **JIS_SHARED_SECRET**:
-- Standaard: `denDolder_2024!`
+- Standaard: `example_secret_123`
 - Of wat je in `.env` hebt gezet
 
 ### Wat je zou moeten zien
@@ -383,7 +383,7 @@ python --version  # Moet >= 3.9 zijn
 
 - Check of je de juiste **JIS_SHARED_SECRET** gebruikt
 - Kijk in `.env` of `docker-compose.yml` voor de secret
-- Standaard is: `denDolder_2024!`
+- Standaard is: `example_secret_123`
 
 ### "Cannot connect to router"
 

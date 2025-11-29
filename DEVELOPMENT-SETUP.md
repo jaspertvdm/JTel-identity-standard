@@ -35,7 +35,7 @@ services:
     environment:
       POSTGRES_DB: my_app_db
       POSTGRES_USER: app_user
-      POSTGRES_PASSWORD: app_secret_2024
+      POSTGRES_PASSWORD: your_app_password
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - app-db-data:/var/lib/postgresql/data
@@ -59,7 +59,7 @@ services:
     environment:
       POSTGRES_DB: betti_router_db
       POSTGRES_USER: betti_user
-      POSTGRES_PASSWORD: betti_secret_2024
+      POSTGRES_PASSWORD: your_betti_password
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - betti-db-data:/var/lib/postgresql/data
@@ -84,10 +84,10 @@ services:
       - "8000:8000"
     environment:
       # APP DATABASE CONNECTION
-      DATABASE_URL: postgresql://app_user:app_secret_2024@app-db:5432/my_app_db
+      DATABASE_URL: postgresql://app_user:your_app_password@app-db:5432/my_app_db
 
       # API Settings
-      SECRET_KEY: denDolder_2024!
+      SECRET_KEY: example_secret_123
       ENVIRONMENT: development
       DEBUG: "true"
 
@@ -118,10 +118,10 @@ services:
       - "18081:18081"
     environment:
       # BETTI DATABASE CONNECTION
-      DATABASE_URL: postgresql://betti_user:betti_secret_2024@betti-db:5432/betti_router_db
+      DATABASE_URL: postgresql://betti_user:your_betti_password@betti-db:5432/betti_router_db
 
       # Router Settings
-      SECRET: denDolder_2024!
+      SECRET: example_secret_123
       PORT: 18081
       NODE_ENV: development
 
@@ -394,10 +394,10 @@ docker-compose logs -f betti-router
 
 ```bash
 # Connect to APP DB
-psql postgresql://app_user:app_secret_2024@localhost:5432/my_app_db
+psql postgresql://app_user:your_app_password@localhost:5432/my_app_db
 
 # Connect to BETTI DB
-psql postgresql://betti_user:betti_secret_2024@localhost:5433/betti_router_db
+psql postgresql://betti_user:your_betti_password@localhost:5433/betti_router_db
 
 # Via pgAdmin
 # Open: http://localhost:5050
@@ -416,7 +416,7 @@ def test_databases():
 
     # Test APP DB
     app_conn = psycopg2.connect(
-        "postgresql://app_user:app_secret_2024@localhost:5432/my_app_db"
+        "postgresql://app_user:your_app_password@localhost:5432/my_app_db"
     )
     app_cursor = app_conn.cursor()
     app_cursor.execute("SELECT COUNT(*) FROM users")
@@ -425,7 +425,7 @@ def test_databases():
 
     # Test BETTI DB
     betti_conn = psycopg2.connect(
-        "postgresql://betti_user:betti_secret_2024@localhost:5433/betti_router_db"
+        "postgresql://betti_user:your_betti_password@localhost:5433/betti_router_db"
     )
     betti_cursor = betti_conn.cursor()
     betti_cursor.execute("SELECT COUNT(*) FROM fira_relationships")
@@ -436,7 +436,7 @@ def test_databases():
     client = TibetBettiClient(
         betti_url="http://localhost:18081",
         kit_url="http://localhost:8000",
-        secret="denDolder_2024!"
+        secret="example_secret_123"
     )
     health = client.health_check()
     print(f"✓ BETTI Router: {health['status']}")
@@ -464,18 +464,18 @@ python test_setup.py
 
 ```bash
 # APP DATABASE
-APP_DATABASE_URL=postgresql://app_user:app_secret_2024@localhost:5432/my_app_db
+APP_DATABASE_URL=postgresql://app_user:your_app_password@localhost:5432/my_app_db
 
 # BETTI DATABASE
-BETTI_DATABASE_URL=postgresql://betti_user:betti_secret_2024@localhost:5433/betti_router_db
+BETTI_DATABASE_URL=postgresql://betti_user:your_betti_password@localhost:5433/betti_router_db
 
 # API URLs
 KIT_API_URL=http://localhost:8000
 BETTI_ROUTER_URL=http://localhost:18081
 
 # Secrets
-APP_SECRET_KEY=denDolder_2024!
-BETTI_SECRET=denDolder_2024!
+APP_SECRET_KEY=example_secret_123
+BETTI_SECRET=example_secret_123
 
 # Development
 DEBUG=true
@@ -556,14 +556,14 @@ WHERE timestamp > NOW() - INTERVAL '24 hours';
 echo "Checking system health..."
 
 # APP DB
-if psql postgresql://app_user:app_secret_2024@localhost:5432/my_app_db -c "SELECT 1" > /dev/null 2>&1; then
+if psql postgresql://app_user:your_app_password@localhost:5432/my_app_db -c "SELECT 1" > /dev/null 2>&1; then
     echo "✓ APP DB: OK"
 else
     echo "✗ APP DB: FAILED"
 fi
 
 # BETTI DB
-if psql postgresql://betti_user:betti_secret_2024@localhost:5433/betti_router_db -c "SELECT 1" > /dev/null 2>&1; then
+if psql postgresql://betti_user:your_betti_password@localhost:5433/betti_router_db -c "SELECT 1" > /dev/null 2>&1; then
     echo "✓ BETTI DB: OK"
 else
     echo "✗ BETTI DB: FAILED"
@@ -623,7 +623,7 @@ from tibet_betti_client import TibetBettiClient
 client = TibetBettiClient(
     betti_url="http://localhost:18081",
     kit_url="http://localhost:8000",
-    secret="denDolder_2024!"
+    secret="example_secret_123"
 )
 
 # Use it!

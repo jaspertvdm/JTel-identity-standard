@@ -23,7 +23,7 @@ from jis_client import JISClient, DIDKey, HIDKey
 
 # Configuratie
 ROUTER_URL = "http://localhost:18081"
-SECRET = "denDolder_2024!"
+SECRET = "example_secret_123"
 
 
 def print_banner(text: str):

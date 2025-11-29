@@ -387,7 +387,7 @@ class AppBettiIntegration:
         self.betti = TibetBettiClient(
             betti_url="http://localhost:18081",  # BETTI service
             kit_url="http://localhost:8000",      # YOUR KIT API
-            secret="denDolder_2024!"
+            secret="example_secret_123"
         )
 
         # Your app DB connection

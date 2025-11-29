@@ -22,7 +22,7 @@ def main():
     # 1. Initialize client
     client = JISClient(
         router_url="http://localhost:18081",
-        secret="denDolder_2024!"  # Change to your router secret
+        secret="example_secret_123"  # Change to your router secret
     )
 
     # 2. Check router health

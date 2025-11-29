@@ -173,7 +173,7 @@ def interactive_mode(client: JISClient):
 def main():
     parser = argparse.ArgumentParser(description="Register verified caller identity")
     parser.add_argument("--router", default="http://localhost:18081", help="JIS Router URL")
-    parser.add_argument("--secret", default=os.getenv("JIS_SECRET", "denDolder_2024!"), help="JIS shared secret")
+    parser.add_argument("--secret", default=os.getenv("JIS_SECRET", "example_secret_123"), help="JIS shared secret")
     parser.add_argument("--phone", help="Phone number (e.g. +31612345678)")
     parser.add_argument("--name", help="Display name")
     parser.add_argument("--did-file", help="Path to existing DID private key file")

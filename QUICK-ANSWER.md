@@ -146,7 +146,7 @@ from tibet_betti_client import TibetBettiClient
 betti = TibetBettiClient(
     betti_url="http://localhost:18081",
     kit_url="http://localhost:8000",  # JOUW API!
-    secret="denDolder_2024!"
+    secret="example_secret_123"
 )
 
 # Establish trust (gaat naar BETTI DB)
@@ -212,7 +212,7 @@ from your_app import db  # JOUW APP DB
 betti = TibetBettiClient(
     betti_url="http://localhost:18081",
     kit_url="http://localhost:8000",
-    secret="denDolder_2024!"
+    secret="example_secret_123"
 )
 
 # 2. User arrives home (jouw app detecteert dit)

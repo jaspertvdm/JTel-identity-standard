@@ -11,7 +11,7 @@ from jis_client import JISClient, DIDKey, HIDKey
 
 # Configuratie
 ROUTER_URL = "http://localhost:18081"  # Pas aan naar je server IP
-SECRET = "denDolder_2024!"              # Pas aan naar je secret
+SECRET = "example_secret_123"              # Pas aan naar je secret
 
 def print_banner(text):
     """Print mooie banner"""

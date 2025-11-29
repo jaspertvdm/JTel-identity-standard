@@ -9,7 +9,7 @@ Perfect for quick prototyping or simple applications.
 from jis_client import DIDKey, HIDKey, JISClient
 
 # 1. Setup
-client = JISClient("http://localhost:18081", secret="denDolder_2024!")
+client = JISClient("http://localhost:18081", secret="example_secret_123")
 did = DIDKey.generate()
 hid = HIDKey.generate()
 
