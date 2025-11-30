@@ -70,5 +70,6 @@ I am taking this vision to the global open-source community at events like **FOS
 
 **Jasper van de Meent (JTel Systems)**
 📧 jtmeent@gmail.com
+www.humotica.com
 
 Open to collaboration, research partnerships, and security reviews.
