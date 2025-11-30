@@ -1,75 +1,186 @@
-# JTel Identity Standard (JIS)
+# JIS - JTel Identity Standard
 
-**A Universal Semantic Layer for Secure, Intent-Driven Digital Interaction.**
+**A Semantic Safety Layer for Human-Machine Interaction**
 
----
-
-### My Digital World is a Chaos of Mistrust. JIS is the Answer.
-
-I juggle dozens of digital channels: messaging apps, IoT devices, AI agents, and APIs. They don't speak the same language, operate without context, and are fundamentally insecure. Traditional security asks *who* you are. JIS asks the questions that truly matter: ***Why*** *are you here? What is your intent? And is this interaction safe, logical, and humane right now?*
-
-JIS is not another security layer to patch a broken system. It's a powerful semantic fabric woven *over* any protocol, giving it a conscience. It provides clarity on provenance (origin), creates intelligent routing, and ensures every digital action is driven by a verifiable purpose.
-
-### How It Works: The Story of a Secure Bank Call
-
-Is that call from your bank a real fraud alert or a clever scam? JIS doesn't guess. It verifies.
-
-*   🤝 Step 1: The Handshake (`FIR/A`)
-    When the bank first joined the JIS network, a **FIR/A (First Initiation Revoke/Accept)** was exchanged. This is the digital handshake—a verifiable agreement that initiates a trusted relationship and establishes a trusted identity.
-
-*   📦 Step 2: The Intent (`TIBET`)
-    The bank doesn't just "call." It issues a **TIBET (Time-based Intent Token)**, a secure "work order" with a clear purpose: `{"intent": "initiate_secure_call", "reason": "fraud_alert"}`.
-
-*   🧠 Step 3: The Context Check (`Humotica` & `F2F4I`)
-    My personal `Brein` (the JIS engine on my device) receives the TIBET. The **Humotica** layer analyzes the context: it's 3 AM, the 5th attempt. Highly irregular. The **F2F4I (Fail2Flag4Intent)** semantic firewall instantly flags this anomaly.
-
-*   💬 Step 4: The Dialogue (`NIR`)
-    Instead of a blind failure, the system starts a dialogue via **NIR (Notify, Identify, Rectify)**. My phone asks: *"A call from your VERIFIED Bank was flagged as unusual. Confirm to proceed?"* I verify with my fingerprint.
-
-*   🔗 Step 5: The Unbreakable Record (`Continuity Chain`)
-    The call connects. Every step—the intent, the flag, my confirmation—is now a permanent, cryptographic link in a **Continuity Chain**, creating a perfect, unbreakable audit trail.
-
-**The Result:** A secure, verified conversation. No guesswork, no spoofing, no contextless interruptions. That's the JIS promise.
+```
+Version: 1.0 Draft (2025)
+Author:  Jasper van de Meent
+License: JOSL (Jasper Open Standard License)
+```
 
 ---
 
-### The Core Building Blocks
+## What is JIS?
 
-JIS is built from a set of powerful, interlocking components:
+JIS (JTel Identity Standard) is a **protocol layer** that sits on top of existing communication protocols (HTTP, MQTT, SIP, WebRTC, Matrix) to provide:
 
-*   🆔 Identity (HID/DID): A cryptographic, privacy-first Human or Device Identity.
-*   🤝 Trust Initiation (`FIR/A`): The verifiable **First Initiation Revoke/Accept** exchange that starts any trusted digital relationship.
-*   📦 The Transactional Layer (`BETTI`/`TIBET`): Secure, time-bound "work orders" that encapsulate intent, from large tasks (`BETTI`) to micro-actions (`TIBET`).
-*   🛡️ The Semantic Firewall (`F2F4I` & `NIR`): An intelligent security layer that detects anomalies in *intent*, not just IP addresses, and resolves them through dialogue.
-*   🔗 The Audit Trail (`Continuity Chain`): The immutable, hashed ledger of every interaction, providing ultimate traceability.
-*   🧠 [The Human Meaning Layer (Humotica)](https://github.com/jaspertvdm/Humotica): The soul of the machine. Humotica is a privacy-first layer that translates human interaction patterns into machine-readable semantics, allowing the system to understand the difference between a typo and a threat. It does **not** profile you; it seeks to understand your intent to keep you safe.
+- **Verifiable Human Identity** (HID)
+- **Device Identity & Trust** (DID)
+- **Intent-Based Authorization** (TIBET)
+- **Semantic Security Validation**
 
----
-
-### A Universal Standard for Any Protocol
-
-JIS is designed to bring trust and meaning to any communication stack:
-*   🔉 SIP / VoIP: For verified, "certified" calling.
-*   📞 WebRTC: For secure, consent-driven peer connections.
-*   🔄 HTTP / REST: For intent-bound, non-spoofable API calls.
-*   🕸️ Matrix: For context-rich events and identity-safe bridging.
-*   📡 MQTT / IoT: For safe, anti-hijacking device autonomy.
+JIS does not replace your existing protocols. It adds a **semantic safety layer** that understands **why** an action is happening, not just **what** is happening.
 
 ---
 
-### Help Me Build a Trustworthy Digital Future
+## Core Concepts
 
-JIS is more than a project; it's a mission to build a more secure, humane, and intelligent digital world. It's an open standard for a future where humans and AI can collaborate with verifiable trust.
+### Identity Model
 
-I am taking this vision to the global open-source community at events like **FOSDEM**. If you believe in this future, I invite you to contribute, challenge, and build with me.
+| Component | Description |
+|-----------|-------------|
+| **HID** | Human Identity - cryptographic, privacy-first, never transmitted |
+| **DID** | Device Identity - derived from HID, used in transmissions |
+| **FIR/A** | First Initiation Revoke/Accept - trust handshake |
 
-*   **Governance:** The project is governed by the rules in `GOVERNANCE.md`.
-*   **License:** Published under the **Jasper Open Standard License (JOSL)**. See `LICENSE.md`.
+### Security States
 
-### Contact
+| State | Meaning |
+|-------|---------|
+| **IO** | Identity OK - human continuity verified |
+| **DO** | Device Opt - device behavior consistent |
+| **OD** | Operation Determination - action validated |
+| **NIR** | Notify, Identify, Rectify - recovery protocol |
 
-**Jasper van de Meent (JTel Systems)**
-📧 jtmeent@gmail.com
-www.humotica.com
+### Content Classification
 
-Open to collaboration, research partnerships, and security reviews.
+| Type | Description |
+|------|-------------|
+| **INFC** | Initially Not Flaggable Content - raw data without semantic context |
+| **OFC** | Operation Flaggable Content - data with verified intent and origin |
+
+---
+
+## Protocol Flow
+
+```
+1. FIR/A Handshake     → Establish trust relationship
+2. TIBET Token         → Declare intent before action
+3. IO/DO/OD Validation → Verify identity, device, operation
+4. SCS Signature       → Semantic Continuity Signature
+5. Continuity Chain    → Immutable audit trail
+```
+
+---
+
+## Key Protocols
+
+### TIBET - Time-based Intent Token
+```json
+{
+  "intent": "send_message",
+  "reason": "user_initiated",
+  "timestamp": "2025-11-30T22:00:00Z",
+  "validity_window": 300,
+  "tibet_token": "TIBET-20251130-..."
+}
+```
+
+### NIR - Recovery Protocol
+```
+NOTIFY   → Alert that something is uncertain
+IDENTIFY → Request human verification
+RECTIFY  → Restore continuity state
+```
+
+### Fail2Flag4Intent
+Semantic anomaly detection based on intent patterns, not just IP addresses or technical errors.
+
+---
+
+## Anti-Deepfake Protection
+
+A deepfake can copy pixels and metadata. It **cannot**:
+
+- Generate valid HID
+- Produce correct IO/DO/OD states
+- Create valid SCS chain
+- Match human behavioral continuity
+
+Any content without valid SCS remains `INFC → flagged → handled`.
+
+---
+
+## Specification Documents
+
+| Document | Description |
+|----------|-------------|
+| [JIS2025.md](JIS2025.md) | Full unified specification |
+| [JIS-HID-DID-OFC.md](JIS-HID-DID-OFC.md) | Human-Origin Assurance Layer |
+| [JIS-RFC.md](JIS-RFC.md) | RFC-style protocol reference |
+| [CONFORMANCE.md](CONFORMANCE.md) | Conformance requirements |
+| [GOVERNANCE.md](GOVERNANCE.md) | Project governance |
+
+---
+
+## SDK
+
+Python SDK for JIS protocol implementation:
+
+```bash
+cd client-sdk/python
+pip install -e .
+```
+
+```python
+from jis_client import JISClient
+
+client = JISClient("https://your-jis-server.com")
+client.register_device(device_type="app", name="MyApp")
+
+# Validate intent before action
+result = client.validate_intent(
+    intent="send_message",
+    context={"to": "@recipient:domain.com"}
+)
+
+if result.approved:
+    # Execute with TIBET token
+    client.execute(result.tibet_token, action)
+```
+
+---
+
+## Integration
+
+JIS works as a semantic layer on top of:
+
+| Protocol | Use Case |
+|----------|----------|
+| **SIP/VoIP** | Verified caller identity |
+| **WebRTC** | Consent-driven connections |
+| **HTTP/REST** | Intent-bound API calls |
+| **Matrix** | Context-rich messaging |
+| **MQTT/IoT** | Secure device autonomy |
+
+---
+
+## Related Projects
+
+- [Humotica/BETTI](https://github.com/jaspertvdm/Humotica) - Physics-based computing framework
+- [JOSL License](https://josl.humotica.com) - Jasper Open Standard License
+
+---
+
+## Author
+
+**Jasper van de Meent**
+JTel Systems | Humotica
+
+- Web: [humotica.com](https://humotica.com)
+- Protocol: [jis.humotica.com](https://jis.humotica.com)
+- Email: jtmeent@gmail.com
+
+---
+
+## License
+
+Published under **JOSL** (Jasper Open Standard License).
+
+Free to use, implement, and integrate. Attribution required.
+
+```
+"Powered by JIS (JTel Identity Standard), authored by Jasper van de Meent."
+```
+
+See [LICENSE.md](LICENSE.md) for full terms.
