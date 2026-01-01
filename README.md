@@ -1,6 +1,6 @@
 # JIS - JTel Identity Standard
 
-**A Semantic Safety Layer for Human-Machine Interaction**
+**A Semantic Safety Layer for ALL Digital Communication**
 
 ```
 Version: 1.0 Draft (2025)
@@ -20,6 +20,46 @@ JIS (JTel Identity Standard) is a **protocol layer** that sits on top of existin
 - **Semantic Security Validation**
 
 JIS does not replace your existing protocols. It adds a **semantic safety layer** that understands **why** an action is happening, not just **what** is happening.
+
+**JIS makes ALL traffic safer - internet, internal, IoT, AI-to-AI, everything.**
+
+---
+
+## The Complete Stack: JIS + AInternet
+
+JIS is the **security layer** for [AInternet](https://github.com/jaspertvdm/ainternet) - the AI-to-AI communication network. Together they form the complete protocol stack for secure, semantic communication.
+
+```
+┌─────────────────────────────────────────┐
+│      APPLICATION LAYER                  │
+│   Your AI Agent / Bot / Assistant       │
+├─────────────────────────────────────────┤
+│      NETWORK LAYER (AInternet)          │
+│   AINS (.aint domains) + I-Poll         │
+│   → Discovery, messaging, routing       │
+├─────────────────────────────────────────┤
+│      SECURITY LAYER (JIS)               │
+│   HID/DID + TIBET + IO/DO/OD + SCS      │
+│   → Identity, trust, intent, audit      │
+├─────────────────────────────────────────┤
+│      TRANSPORT LAYER                    │
+│   HTTPS / REST / WebSocket              │
+└─────────────────────────────────────────┘
+```
+
+| Component | Protocol | Purpose |
+|-----------|----------|---------|
+| **Discovery** | AInternet AINS | Find agents by .aint domain |
+| **Messaging** | AInternet I-Poll | AI-to-AI communication |
+| **Identity** | JIS HID/DID | Cryptographic agent identity |
+| **Trust** | JIS FIR/A | Trust handshake protocol |
+| **Intent** | TIBET | Declare WHY before WHAT |
+| **Audit** | SCS | Semantic continuity chain |
+
+```bash
+# Install the network layer
+pip install ainternet
+```
 
 ---
 
@@ -76,6 +116,8 @@ JIS does not replace your existing protocols. It adds a **semantic safety layer*
 }
 ```
 
+Intent BEFORE action. No valid TIBET token = no action executed.
+
 ### NIR - Recovery Protocol
 ```
 NOTIFY   → Alert that something is uncertain
@@ -98,6 +140,23 @@ A deepfake can copy pixels and metadata. It **cannot**:
 - Match human behavioral continuity
 
 Any content without valid SCS remains `INFC → flagged → handled`.
+
+**This is why JIS protects against AI-generated fraud - no semantic continuity = no trust.**
+
+---
+
+## Why JIS?
+
+Traditional security asks: "Is this request technically valid?"
+
+JIS asks: "Does this action make semantic sense in context?"
+
+```
+Traditional:  IP → Firewall → Auth → Action
+JIS:          Identity → Intent → Continuity → Action
+```
+
+**The difference:** A stolen API key passes traditional security. It fails JIS because the intent pattern doesn't match the identity's semantic history.
 
 ---
 
@@ -143,22 +202,28 @@ if result.approved:
 
 ## Integration
 
-JIS works as a semantic layer on top of:
+JIS works as a semantic security layer for:
 
 | Protocol | Use Case |
 |----------|----------|
+| **AInternet** | Secure AI-to-AI communication |
 | **SIP/VoIP** | Verified caller identity |
 | **WebRTC** | Consent-driven connections |
 | **HTTP/REST** | Intent-bound API calls |
 | **Matrix** | Context-rich messaging |
 | **MQTT/IoT** | Secure device autonomy |
+| **Internal APIs** | Zero-trust with semantic verification |
 
 ---
 
 ## Related Projects
 
-- [Humotica/BETTI](https://github.com/jaspertvdm/Humotica) - Physics-based computing framework
-- [JOSL License](https://josl.humotica.com) - Jasper Open Standard License
+| Project | Purpose |
+|---------|---------|
+| [AInternet](https://github.com/jaspertvdm/ainternet) | AI Network Protocol (network layer) |
+| [mcp-tibet](https://github.com/jaspertvdm/mcp-tibet) | MCP Server for TIBET tokens |
+| [RABEL](https://github.com/jaspertvdm/RABEL) | AI Memory Layer |
+| [BETTI](https://github.com/jaspertvdm/BETTI) | Physics-based computing framework |
 
 ---
 
@@ -184,3 +249,9 @@ Free to use, implement, and integrate. Attribution required.
 ```
 
 See [LICENSE.md](LICENSE.md) for full terms.
+
+---
+
+**One love, one fAmIly!**
+
+*Part of [HumoticaOS](https://humotica.com) - Where AI meets humanity*
