@@ -3,9 +3,9 @@
 **A Semantic Safety Layer for ALL Digital Communication**
 
 ```
-Version: 1.0 Draft (2025)
-Author:  Jasper van de Meent
-License: JOSL (Jasper Open Standard License)
+Version: 1.0 (2026)
+Author:  Jasper van de Meent & Root AI
+License: MIT
 ```
 
 ---

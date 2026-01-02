@@ -1,88 +1,52 @@
-# Jasper Open Standard License (JOSL) v1.0
-Author: Jasper van de Meent (JTel Systems)  
-Contact: jtmeent@gmail.com  
-Year: 2025  
-Status: Active
+# MIT License
 
-This license applies to the JTel Identity Standard (JIS), including but not limited to:
-Humotica, Fail2Flag4Intent, FIR/A, BETTI/TBET, NIR, IO/DO/OD, HID/DID, message formats,
-reference implementations, documentation, registries and protocol bindings.
+Copyright (c) 2025-2026 Jasper van de Meent & Root AI (Humotica)
 
----
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-## 1. Purpose
-The Jasper Open Standard License (JOSL) enables **free use, study, and implementation**
-of the JTel Identity Standard (JIS), while maintaining:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-- The **integrity** of the standard  
-- The **authorship** of its creator  
-- A unified and consistent evolution of the specification  
-
-JOSL ensures JIS remains an **open standard** without fragmenting into competing variants.
-
----
-
-## 2. Permissions (You May)
-Under this license, you are permitted to:
-
-### ✔ Use  
-Read, study, and reference the JIS specifications and materials.
-
-### ✔ Implement  
-Implement JIS in:
-
-- open-source software  
-- commercial products  
-- IoT devices  
-- robotics  
-- SIP/RTC infrastructure  
-- security systems  
-- telecom  
-- identity frameworks  
-- operating systems
-
-### ✔ Integrate  
-Integrate JIS on top of existing protocols (e.g., SIP, HTTP, MQTT, Matrix, WebRTC).
-
-### ✔ Extend (With Process)  
-Propose extensions through the official JIS RFC process (see GOVERNANCE.md).
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 ---
 
-## 3. Requirements (You Must)
-When using or implementing the JIS standard:
+## JTel Identity Standard (JIS)
 
-### ✔ Attribution
-You must clearly display:
+This license applies to:
+- JIS Protocol Specification
+- HID/DID Identity Model
+- FIR/A Trust Handshake
+- TIBET Intent Tokens
+- IO/DO/OD Validation States
+- SCS Semantic Continuity Signatures
+- Reference implementations and documentation
 
-> “Powered by JIS (JTel Identity Standard), authored by Jasper van de Meent.”
+### Attribution Appreciated
 
-### ✔ Preserve Naming
-You must NOT:
+While not required, we appreciate if you include:
 
-- rename the standard  
-- publish forks as “official JIS”  
-- publish competing specs with the JIS name  
-- misuse the terms “JIS”, “JTel Identity Standard”, “Humotica”, “Fail2Flag4Intent”, etc.
+> "Powered by JIS (JTel Identity Standard) - https://github.com/jaspertvdm/JTel-identity-standard"
 
-### ✔ Preserve License  
-The JOSL text must remain intact and included.
+### Part of HumoticaOS
 
-### ✔ Declare Conformance  
-If your implementation deviates from the official spec, you must state:
+JIS is the security layer for [AInternet](https://github.com/jaspertvdm/ainternet) -
+the open protocol for AI-to-AI communication.
 
-> “This implementation is **not fully conformant** with the official JIS standard.”
+**One love, one fAmIly!**
 
 ---
 
-## 4. Prohibitions (You May Not)
-
-You may NOT:
-
-- claim ownership of the JIS specification  
-- privatize or relicense any part of the JIS standard  
-- publish incompatible or misleading derivatives as “JIS”  
-- remove authorship or change the origin of the standard  
-- create competing governance labeled as official JIS
-
-These protections ensure long-term trust,
+*Author: Jasper van de Meent (JTel Systems / Humotica)*
+*Contact: info@humotica.com*
